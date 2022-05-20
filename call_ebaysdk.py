@@ -35,9 +35,11 @@ def main():
         'samsung galaxy a53',
         'samsung galaxy phone',
     ]
-    count = 0
+    total_count = 0
     for keyword in keywords:
-        for i in range(10):
+        count = 1 # start this at 1 so we can enter the while loop
+        i = 0
+        while count != 0:
             payload = {
                 'keywords': keyword,
                 'paginationInput':
@@ -49,8 +51,9 @@ def main():
             r = call_api(payload)
             j = json.loads(r.json())
             print("Items in {}: {} ".format(i,j['searchResult']['_count']))
+            count = j['searchResult']['_count']
             if int(j['searchResult']['_count']) == 0: break
-            count += int(j['searchResult']['_count'])
+            total_count += int(j['searchResult']['_count'])
             f = open('{}_{}.csv'.format(keyword,i),'w')
             f.write('"title","pCategoryName","pCategoryID","sCategoryName","sCategoryID","itemId","price"\n')
             for item in r.reply.searchResult.item:
@@ -71,7 +74,8 @@ def main():
                     f.write('\"{}\",\"{}\",\"{}\",\"\",\"\",\"{}\",\"{}\"\n'.format(str(item.title).replace('"',''),str(item.primaryCategory.categoryName).replace('"',''),\
                             str(item.primaryCategory.categoryId).replace('"',''),str(item.itemId).replace('"',''),str(item.sellingStatus.currentPrice.value).replace('"','')))
             f.close()
-    print(count)
+            i += 1
+    print(total_count)
 
 if __name__ == '__main__':
     main()
